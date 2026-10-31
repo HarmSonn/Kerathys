@@ -63,7 +63,7 @@ Tools:
 
 ## Phase 3: Gold and stability
 
-- Gold sinks (buildings, upkeep, later research and armies) and a source of income.
+- Introduce gold: a source of income and things to spend it on (upkeep, special buildings, later research and armies). Buildings cost only materials until then.
 - Tax with a real trade-off.
 - More reasons for stability to rise and fall, and consequences for low stability: refusing work, leaving, and rebellion.
 

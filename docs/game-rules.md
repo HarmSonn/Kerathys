@@ -24,26 +24,26 @@ These numbers are starting points for the first playtest. The headless runner bu
 
 Buildings have real footprints that match their art. This replaces the prototype's 1-cell footprint drawn at 1.5 cells.
 
-| Building | Footprint | Wood / Stone / Gold | Storage | Workers | Build time |
+| Building | Footprint | Wood / Stone | Storage | Workers | Build time |
 |---|---|---|---|---|---|
 | Town Center | 4 × 4 | starter | 300 | none | n/a |
-| Storage area | 2 × 2 | 4 / 0 / 0 | 200 | none | 10 s |
-| Storehouse | 3 × 3 | 8 / 4 / 10 | 400 | none | 30 s |
-| House | 2 × 2 | 6 / 2 / 0 | n/a | none (holds 4 subjects) | 20 s |
-| Woodcutter | 2 × 2 | 3 / 0 / 0 | n/a | 2 | 15 s |
-| Quarry | 2 × 2 | 4 / 0 / 0 | n/a | 3 | 15 s |
-| Farm | 2 × 2 | 6 / 0 / 0 | n/a | 2 | 20 s |
-| Mill | 3 × 3 | 7 / 3 / 20 | n/a | 1 | 30 s |
-| Bakery | 3 × 3 | 7 / 3 / 20 | n/a | 1 | 30 s |
+| Storage area | 2 × 2 | 4 / 0 | 200 | none | 10 s |
+| Storehouse | 3 × 3 | 8 / 4 | 400 | none | 30 s |
+| House | 2 × 2 | 6 / 2 | n/a | none (holds 4 subjects) | 20 s |
+| Woodcutter | 2 × 2 | 3 / 0 | n/a | 2 | 15 s |
+| Quarry | 2 × 2 | 4 / 0 | n/a | 3 | 15 s |
+| Farm | 2 × 2 | 6 / 0 | n/a | 2 | 20 s |
+| Mill | 3 × 3 | 7 / 3 | n/a | 1 | 30 s |
+| Bakery | 3 × 3 | 7 / 3 | n/a | 1 | 30 s |
 
-Build time counts only once materials are on site (section 8).
+Buildings cost only building materials, no gold. Build time counts only once materials are on site (section 8).
 
 ### Placement
 
 - The whole footprint must be on open ground, inside the map, with at least 1 empty cell between footprints.
 - **Gatherers (woodcutter, quarry)** go on open ground and need at least 1 matching resource cell inside their work area.
 - **Work area:** a circle with a radius of 4 cells. Its centre starts on the building and can be dragged up to 6 cells away. It is shown as a soft circle while placing and while the building is selected, with reachable trees or rocks highlighted.
-- Gold is paid at placement and must be available. Wood and stone are not needed up front: the construction site waits for carriers to bring them.
+- Nothing is paid at placement. The construction site waits for carriers to bring its wood and stone, so you can place a building before you have the materials.
 
 ## 4. Production
 
@@ -117,17 +117,16 @@ Build time counts only once materials are on site (section 8).
 | 25 to 49 | ×0.9 |
 | below 25 | ×0.75 |
 
-- No tax in slice 1. Tax comes in Phase 3, once gold has uses.
+- No tax and no gold in slice 1. Both come in Phase 3.
 
 ## 11. Starting state
 
 - Town Center centred at (20, 20), with two houses to its west (exact cells are set in Phase 1).
 - 6 subjects, housing for 8.
-- Town Center stock: 20 wood, 8 stone, 40 bread. Treasury: 50 gold. Stability 60.
+- Town Center stock: 20 wood, 8 stone, 40 bread. Stability 60.
 
 ## 12. Open items
 
-- **Gold has no income in slice 1.** With 50 gold you can afford exactly one mill, one bakery and one storehouse. That caps the slice at one food chain, which feeds about 28 subjects. Decide whether that's fine for the first playtest or whether to start with more gold.
 - Recruit training time.
 - Refunds when demolishing a building or cancelling a construction site.
 - Check in playtest: the 30-bread Town Center reserve, carrier priorities, path fading, regrowth rates.
