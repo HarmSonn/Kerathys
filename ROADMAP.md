@@ -12,11 +12,13 @@ Rules and numbers are in `docs/game-rules.md` and art requirements are in `docs/
 - Carriers and builders as general job pools; carriers haul one item per trip.
 - Paths form where subjects walk often.
 - Recruiting costs 10 food, which must be at the Town Center.
-- Stability bands affect walking and work speed.
+- Settlers-style work: gatherers walk out to trees, rocks and fields and carry the result home.
+- A balanced food chain: farm, mill and bakery each handle 8 per day.
+- Hunger: after 2 hungry nights in a row, subjects start leaving.
 - Relaxed placement with a movable work area.
 - Hand-drawn art in a three-quarter view.
 - Browser only.
-- Tax deferred to Phase 3.
+- Gold, tax and stability parked until Phase 3.
 
 **Remaining:** the open items in `docs/game-rules.md` section 12; the artist's questions in `docs/art-spec.md` section 9.
 
@@ -38,13 +40,13 @@ New:
 - Output and input buffers, per-store stock and limits.
 - Carriers and the job dispatcher.
 - Recruiting at the Town Center.
-- Eating at nightfall.
-- Stability.
+- Settlers-style work cycles: walking to trees, rocks and farm fields.
+- Eating at nightfall, hunger and subjects leaving.
 
 Tools:
 - Save and load to JSON, with autosave.
-- A headless runner that simulates N days and prints stock, population, food and stability over time.
-- Unit tests for the dispatcher, food chains, deposits, stability bands and save round-trips.
+- A headless runner that simulates N days and prints stock, population and food over time.
+- Unit tests for the dispatcher, food chains, deposits and regrowth, hunger and leaving, and save round-trips.
 - Template files for the art (footprint and anchor marked).
 - The engine loads PNGs from the art folders and falls back to placeholder shapes for anything not drawn yet.
 
@@ -65,7 +67,7 @@ Tools:
 
 - Introduce gold: a source of income and things to spend it on (upkeep, special buildings, later research and armies). Buildings cost only materials until then.
 - Tax with a real trade-off.
-- More reasons for stability to rise and fall, and consequences for low stability: refusing work, leaving, and rebellion.
+- Introduce stability, starting from the speed bands parked in `docs/game-rules.md` section 11: reasons for it to rise and fall, and consequences such as refusing work and rebellion.
 
 **Done when:** high, medium and low tax each make sense in some situation.
 
