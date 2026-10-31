@@ -16,7 +16,7 @@ These numbers are starting points for the first playtest. The headless runner bu
 
 - One province on a hidden 40 × 40 grid. Players never see the grid.
 - Cell types: open ground, forest, hill. Generation follows the prototype: 3-octave value noise; the centre is forced open (smoothstep from radius 5 to 9); a forest bump at (14, 15) and a hills bump at (26, 25); forest where the forest field exceeds 0.55, hills where the hill field exceeds 0.58; hills take precedence.
-- **Forest cell:** up to 3 trees, each giving 4 wood. A cell missing trees regrows one tree every 15 days. Across a typical woodcutter's work area (about 30 forest cells) that is about **2 trees per day**.
+- **Forest cell:** up to 3 trees, each giving **2 wood**. A cell missing trees regrows one tree every 15 days. Across a typical woodcutter's work area (about 30 forest cells) that is about 2 trees, or 4 wood, per day. A woodcutter takes about 6.7 wood per day, so **forests run out**: slowly with one woodcutter, quickly with two.
 - **Hill cell:** 20 stone, never regrows *(proposal)*.
 - Trees and rocks are drawn per cell and thin out as they are used up. Empty cells show stumps or bare rock.
 
@@ -52,7 +52,7 @@ Workers really work, as in The Settlers IV: gatherers leave their building, walk
 
 | Building | Work cycle (per worker) | Per worker per day | Per building per day |
 |---|---|---|---|
-| Woodcutter | Walk to the nearest tree in the work area, chop 30 s, carry 1 wood home. A tree is gone after 4 trips. | ~3.3 | ~6.7 (2 workers) |
+| Woodcutter | Walk to the nearest tree in the work area, chop 30 s, carry 1 wood home. A tree is gone after 2 trips. | ~3.3 | ~6.7 (2 workers) |
 | Quarry | Walk to the nearest rock in the work area, work 45 s, carry 1 stone home | ~2.3 | ~7 (3 workers) |
 | Farm | Walk to an empty field cell and sow (12 s). The crop ripens in 60 s. Walk to a ripe cell, harvest (12 s), carry 1 grain home. About 30 s per grain including walking. | 4 | **8** (2 workers) |
 | Mill | 15 s: 1 grain → 1 flour | 8 | **8** |
