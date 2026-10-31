@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kerathys: Rotar Settlement</title>
+<style>
+:root{--bg:#e8ede4;--fg:#1f2a1f;--card:#f6f8f3;--line:#c3cdbb;--acc:#3f5a3a;--bad:#b3362b;--btn:#dbe3d4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a16;--fg:#e4eadf;--card:#212721;--line:#3a443a;--acc:#9cc58f;--bad:#f0806f;--btn:#2d362d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161a16;--fg:#e4eadf;--card:#212721;--line:#3a443a;--acc:#9cc58f;--bad:#f0806f;--btn:#2d362d;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{max-width:680px;margin:0 auto;padding:8px}
+h1{font:600 17px/1.2 Georgia,"Times New Roman",serif;margin:2px 0 6px}
+#stats{display:flex;flex-wrap:wrap;gap:4px 10px;padding:6px 8px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-variant-numeric:tabular-nums}
+#stats b.bad{color:var(--bad)}
+canvas{width:100%;aspect-ratio:1;display:block;border-radius:8px;touch-action:manipulation;border:1px solid var(--line)}
+#msg{min-height:20px;margin:4px 0;color:var(--acc)}#msg.err{color:var(--bad)}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0}
+button{font:inherit;color:var(--fg);background:var(--btn);border:1px solid var(--line);border-radius:7px;padding:6px 9px;cursor:pointer}
+button.on{background:var(--acc);color:var(--bg);border-color:var(--acc)}button:disabled{opacity:.45}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#pal{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}#pal button{white-space:nowrap;flex:0 0 auto;text-align:left;line-height:1.25}
+#pal small{display:block;opacity:.8}
+#panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:56px}
+input[type=range]{flex:1;min-width:120px;accent-color:var(--acc)}
+</style></head><body><div id="app">
+<h1>Kerathys: Rotar Settlement</h1>
+<div id="stats"></div>
+<canvas id="cv" width="800" height="800"></canvas>
+<div id="msg">Pick a building, then point at the map to see its outline. Woodcutters go in forests, quarries on grey hills.</div>
+<div class="row"><button id="b0">⏸</button><button id="b1" class="on">1×</button><button id="b2">2×</button><button id="b4">4×</button>
+<label style="display:flex;gap:6px;align-items:center;flex:1;min-width:200px">Tax <input id="tax" type="range" min="0" max="0.5" step="0.05" value="0.1"><span id="taxv"></span></label></div>
+<div id="pal"></div>
+<div id="panel"></div>
+</div>
+<script>
+const N=40,S=20,TICK=5;
+const h2=(x,y,s)=>{const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)};
+const sm=t=>t*t*(3-2*t);
+const ss=(a,b,x)=>sm(Math.min(1,Math.max(0,(x-a)/(b-a))));
+function vn(x,y,s){const xi=Math.floor(x),yi=Math.floor(y),xf=sm(x-xi),yf=sm(y-yi);
+const a=h2(xi,yi,s),b=h2(xi+1,yi,s),c=h2(xi,yi+1,s),d=h2(xi+1,yi+1,s);return a+(b-a)*xf+(c-a)*yf+(a-b-c+d)*xf*yf}
+const fbm=(x,y,s)=>vn(x,y,s)*.55+vn(x*2,y*2,s+1)*.3+vn(x*4,y*4,s+2)*.15;
+function fields(x,y){const clr=ss(5,9,Math.hypot(x-20,y-20));const bump=(cx,cy,r)=>Math.max(0,1-Math.hypot(x-cx,y-cy)/r);
+return[(fbm(x*.13,y*.13,3)*.8+bump(14,15,7)*.45)*clr,(fbm(x*.11,y*.11,9)*.8+bump(26,25,6)*.5)*clr]}
+const cells=[];
+for(let y=0;y<N;y++)for(let x=0;x<N;x++){const[F,H]=fields(x+.5,y+.5);let t="g",cap=0;
+if(H>.58){t="h";cap=250}else if(F>.55){t="f";cap=60}cells.push({t,v:cap,cap,heat:0})}
+const tb=document.createElement("canvas");tb.width=tb.height=160;
+{const c=tb.getContext("2d"),id=c.createImageData(160,160);
+for(let py=0;py<160;py++)for(let px=0;px<160;px++){const x=px/4+.125,y=py/4+.125,[F,H]=fields(x,y),n=vn(x*3,y*3,5);
+let r=104+n*24,g=156+n*22,b=78+n*14;const f=ss(.45,.62,F)*.9,hh=ss(.5,.66,H);
+r+=(58-r)*f;g+=(104-g)*f;b+=(60-b)*f;r+=(150+n*20-r)*hh;g+=(140+n*16-g)*hh;b+=(118+n*14-b)*hh;
+const i=(py*160+px)*4;id.data[i]=r;id.data[i+1]=g;id.data[i+2]=b;id.data[i+3]=255}
+c.putImageData(id,0,0)}
+const T={
+storehouse:{n:"Storehouse",e:"📦",c:[30,10,0],col:"#a67c52"},
+house:{n:"House",e:"🏠",c:[20,5,0],col:"#c9a27a"},
+woodcutter:{n:"Woodcutter",e:"🪓",c:[10,0,0],col:"#7a5c3a",slots:2,res:"wood",rate:1},
+quarry:{n:"Quarry",e:"⛏️",c:[15,0,0],col:"#7d7f86",slots:3,res:"stone",rate:.6},
+farm:{n:"Farm",e:"🌾",c:[20,0,0],col:"#d4b84a",slots:2,res:"grain",rate:1.2},
+mill:{n:"Mill",e:"⚙️",c:[25,10,20],col:"#b79b6d",slots:1,inR:"grain",res:"flour",rate:2,ratio:1},
+bakery:{n:"Bakery",e:"🥖",c:[25,10,20],col:"#c98a4b",slots:1,inR:"flour",res:"food",rate:2,ratio:1.5}};
+const WC={wood:"#5a3b20",stone:"#9a9ca3",grain:"#e3c34a",flour:"#f4f1e6",food:"#e0894a"};
+const st={wood:40,stone:15,gold:50,food:75,grain:0,flour:0,R:4,tax:.1,stab:74,t:0,imm:0,speed:1,sel:null,tool:null};
+const B=[],W=[],edges=new Map();let ghost=null;
+const pos=b=>({x:b.x+.5+b.ox,y:b.y+.5+b.oy});
+function addB(type,x,y){const b={type,x,y,n:0,ox:(h2(x,y,1)-.5)*.5,oy:(h2(x,y,2)-.5)*.5};B.push(b);return b}
+addB("storehouse",20,20);addB("house",17,19);addB("house",17,22);
+const emp=()=>B.reduce((a,b)=>a+b.n,0);
+const cap=()=>B.filter(b=>b.type==="house").length*4;
+const prod=()=>st.stab>=70?1:st.stab>=40?.8:.5;
+function setN(b,n){const J=T[b.type];if(!J.slots)return;n=Math.max(0,Math.min(J.slots,n));
+while(b.n<n&&emp()<st.R){const p=pos(b);const T0=8/(J.rate*prod());W.push({b,x:p.x,y:p.y,s:J.inR?"pick":"work",t:T0,T:T0,c:0});b.n++}
+while(b.n>n){const i=W.map(w=>w.b).lastIndexOf(b);W.splice(i,1);b.n--}}
+function store(x,y){let best=null,bd=1e9;for(const b of B)if(b.type==="storehouse"){const d=Math.hypot(b.x-x,b.y-y);if(d<bd){bd=d;best=b}}return best}
+function walk(w,tx,ty,dt){const dx=tx-w.x,dy=ty-w.y,d=Math.hypot(dx,dy),ci=Math.floor(w.y)*N+Math.floor(w.x);
+const sp=(cells[ci]&&cells[ci].heat>=30?4.5:3)*dt;if(d<=sp){w.x=tx;w.y=ty;return true}
+w.x+=dx/d*sp;w.y+=dy/d*sp;const nc=Math.floor(w.y)*N+Math.floor(w.x);if(nc!==ci&&cells[nc]){if(cells[nc].heat<60)cells[nc].heat++;const k=ci<nc?ci+"_"+nc:nc+"_"+ci;edges.set(k,Math.min(60,(edges.get(k)||0)+1))}return false}
+function take(res,n,bx,by){const want=res==="wood"?"f":"h";const l=[];
+for(let y=Math.max(0,by-4);y<=Math.min(N-1,by+4);y++)for(let x=Math.max(0,bx-4);x<=Math.min(N-1,bx+4);x++){const c=cells[y*N+x];if(c.t===want&&c.v>0)l.push([Math.hypot(x-bx,y-by),c])}
+l.sort((a,b)=>a[0]-b[0]);let got=0;for(const[,c]of l){const k=Math.min(c.v,n-got);c.v-=k;got+=k;if(got>=n)break}return got}
+function stepW(w,dt){const b=w.b,J=T[b.type],bp=pos(b);
+if(w.s==="pick"){const sp=pos(store(b.x,b.y));if(!walk(w,sp.x,sp.y,dt))return;if(st[J.inR]>=8){st[J.inR]-=8;w.c=8;w.s="back"}}
+else if(w.s==="back"){if(walk(w,bp.x,bp.y,dt)){w.s="work";w.T=w.t=8/(J.rate*prod())}}
+else if(w.s==="work"){w.t-=dt;if(w.t<=0){let n;if(J.inR)n=w.c*J.ratio;else n=J.res==="grain"?8:take(J.res,8,b.x,b.y);
+if(n<=0){w.T=w.t=1;return}w.c=n;w.s="deliver"}}
+else if(w.s==="deliver"){const sp=pos(store(b.x,b.y));if(!walk(w,sp.x,sp.y,dt))return;st[J.res]+=w.c;w.c=0;w.s=J.inR?"pick":"back"}}
+function sim(dt){st.t+=dt;st.food=Math.max(0,st.food-.10*st.R*dt);const starving=st.food<=0;
+st.gold+=st.tax*emp()*dt;const tgt=80-60*st.tax-(starving?30:0);st.stab+=Math.max(-dt,Math.min(dt,tgt-st.stab));
+st.imm+=dt;if(st.imm>=10){st.imm=0;if(st.R<cap()&&st.food>0&&st.stab>=50)st.R++}
+for(const c of cells)if(c.t==="f"&&c.v<c.cap)c.v=Math.min(c.cap,c.v+.03*dt);
+for(const w of W)stepW(w,dt)}
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+function draw(){ctx.imageSmoothingEnabled=true;ctx.drawImage(tb,0,0,800,800);
+ctx.lineCap="round";ctx.lineJoin="round";
+for(const[k,h]of edges){if(h<2)continue;const[a,e]=k.split("_").map(Number),t=Math.min(1,h/40);
+ctx.strokeStyle="rgb("+(127+33*t|0)+","+(165-45*t|0)+","+(100-28*t|0)+")";
+ctx.lineWidth=S*(.18+.22*Math.min(1,h/30));ctx.beginPath();ctx.moveTo((a%N+.5)*S,((a/N|0)+.5)*S);ctx.lineTo((e%N+.5)*S,((e/N|0)+.5)*S);ctx.stroke()}
+for(let i=0;i<cells.length;i++){const c=cells[i];if(!c.cap||c.v<=0)continue;const x=i%N,y=(i/N)|0,k=Math.ceil(3*c.v/c.cap);
+for(let j=0;j<k;j++){const px=(x+.15+h2(x,y,j)*.7)*S,py=(y+.15+h2(y,x,j+4)*.7)*S;
+if(c.t==="f"){ctx.fillStyle="#2c6137";ctx.beginPath();ctx.arc(px,py,S*.3,0,7);ctx.fill();ctx.fillStyle="#418a4b";ctx.beginPath();ctx.arc(px-2,py-3,S*.17,0,7);ctx.fill()}
+else{ctx.fillStyle="#8b8d93";ctx.beginPath();ctx.ellipse(px,py,S*.3,S*.2,0,0,7);ctx.fill();ctx.fillStyle="#b3b5ba";ctx.beginPath();ctx.ellipse(px-2,py-2,S*.14,S*.09,0,0,7);ctx.fill()}}}
+for(const b of [...B].sort((a,b)=>a.y-b.y)){const p=pos(b),s=S*1.5;ctx.fillStyle="rgba(0,0,0,.25)";ctx.beginPath();ctx.ellipse(p.x*S,p.y*S+s*.42,s*.55,s*.2,0,0,7);ctx.fill();
+ctx.fillStyle=T[b.type].col;ctx.strokeStyle=b===st.sel?"#fff":"rgba(0,0,0,.45)";ctx.lineWidth=b===st.sel?3:1.5;
+ctx.beginPath();ctx.roundRect(p.x*S-s/2,p.y*S-s/2,s,s,6);ctx.fill();ctx.stroke();
+ctx.font=(S*.95)+"px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(T[b.type].e,p.x*S,p.y*S+1);
+if(T[b.type].slots){const ws=W.filter(w=>w.b===b),sl=T[b.type].slots,bw=(s-2*(sl-1))/sl;
+ws.forEach((w,i)=>{const pr=w.s==="deliver"?1:w.s==="work"?Math.max(0,Math.min(1,1-w.t/w.T)):0;
+const x0=p.x*S-s/2+i*(bw+2),y0=p.y*S+s/2+3;ctx.fillStyle="rgba(0,0,0,.5)";ctx.fillRect(x0,y0,bw,5);
+ctx.fillStyle=w.s==="deliver"?"#e8b92e":"#58b85a";ctx.fillRect(x0,y0,bw*pr,5)})}}
+for(const w of W){const r=T[w.b.type].res;ctx.fillStyle=WC[r];ctx.strokeStyle="#111";ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(w.x*S,w.y*S,S*.2,0,7);ctx.fill();ctx.stroke();
+if(w.c>0&&(w.s==="deliver")){ctx.fillStyle=WC[r];ctx.beginPath();ctx.arc(w.x*S,w.y*S-S*.35,S*.12,0,7);ctx.fill();ctx.stroke()}}
+if(st.tool&&ghost){const g=ghost,ok=!canPlace(st.tool,g.x,g.y),s=S*1.5,gx=(g.x+.5)*S,gy=(g.y+.5)*S;
+ctx.save();ctx.setLineDash([6,4]);ctx.lineWidth=2.5;ctx.strokeStyle=ok?"#5ee06a":"#ff6a5a";ctx.fillStyle=ok?"rgba(94,224,106,.22)":"rgba(255,106,90,.22)";
+ctx.beginPath();ctx.roundRect(gx-s/2,gy-s/2,s,s,6);ctx.fill();ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=.7;ctx.font=(S*.95)+"px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(T[st.tool].e,gx,gy+1);ctx.restore()}}
+const $=id=>document.getElementById(id),msg=(t,e)=>{$("msg").textContent=t;$("msg").className=e?"err":""};
+function canPlace(type,cx,cy){const c=cells[cy*N+cx];if(!c)return"Outside the map.";
+if(type==="woodcutter"&&c.t!=="f")return"Woodcutters must be built in a forest.";
+if(type==="quarry"&&c.t!=="h")return"Quarries must be built on grey hills.";
+if(type!=="woodcutter"&&type!=="quarry"&&c.t!=="g")return"Needs open ground.";
+if(B.some(b=>Math.hypot(b.x-cx,b.y-cy)<2))return"Too close to another building.";
+const k=T[type].c;if(st.wood<k[0]||st.stone<k[1]||st.gold<k[2])return"Not enough resources.";return""}
+const costTxt=c=>[c[0]&&c[0]+"🪵",c[1]&&c[1]+"🪨",c[2]&&c[2]+"🪙"].filter(Boolean).join(" ")||"free";
+cv.addEventListener("pointerdown",e=>{const r=cv.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width*N,fy=(e.clientY-r.top)/r.height*N,cx=Math.floor(fx),cy=Math.floor(fy);
+if(st.tool){const touch=e.pointerType!=="mouse";if(touch&&!(ghost&&ghost.x===cx&&ghost.y===cy)){ghost={x:cx,y:cy};const er=canPlace(st.tool,cx,cy);msg(er||"Tap the outline again to build.",!!er);return}
+ghost={x:cx,y:cy};const err=canPlace(st.tool,cx,cy);if(err){msg(err,1);return}const k=T[st.tool].c;st.wood-=k[0];st.stone-=k[1];st.gold-=k[2];
+st.sel=addB(st.tool,cx,cy);msg(T[st.tool].n+" built.");if(touch)ghost=null}
+else{let best=null,bd=1.3;for(const b of B){const p=pos(b),d=Math.hypot(p.x-fx,p.y-fy);if(d<bd){bd=d;best=b}}st.sel=best;msg("")}
+ui()});
+const cellAt=e=>{const r=cv.getBoundingClientRect();return{x:Math.floor((e.clientX-r.left)/r.width*N),y:Math.floor((e.clientY-r.top)/r.height*N)}};
+cv.addEventListener("pointermove",e=>{if(st.tool&&e.pointerType==="mouse")ghost=cellAt(e)});
+cv.addEventListener("pointerleave",()=>{ghost=null});
+function pal(){const p=$("pal");p.innerHTML="";const a=document.createElement("button");a.textContent="✋ Select";a.className=st.tool?"":"on";a.onclick=()=>{st.tool=null;pal()};p.appendChild(a);
+for(const k of["woodcutter","quarry","farm","mill","bakery","house","storehouse"]){const b=document.createElement("button"),t=T[k];
+b.innerHTML=t.e+" "+t.n+"<small>"+costTxt(t.c)+"</small>";b.className=st.tool===k?"on":"";b.onclick=()=>{st.tool=k;ghost=null;msg("Move over the map to preview the "+t.n.toLowerCase()+", then click or tap again to build.");pal()};p.appendChild(b)}}
+function ui(){const e=emp(),stab=Math.round(st.stab);
+$("stats").innerHTML="<span>🪵 "+Math.floor(st.wood)+"</span><span>🪨 "+Math.floor(st.stone)+"</span><span>🪙 "+Math.floor(st.gold)+"</span><span>"+(st.food<=0?"<b class=bad>🍞 0, starving</b>":"🍞 "+Math.floor(st.food))+"</span><span>👥 "+e+"/"+st.R+" of "+cap()+"</span><span>☺ "+stab+"%</span><span>🌾 "+Math.floor(st.grain)+" 🥣 "+Math.floor(st.flour)+"</span><span>Day "+Math.floor(st.t)+"</span>";
+$("taxv").textContent=st.tax.toFixed(2)+" 🪙";
+const s=st.sel,p=$("panel");if(!s){p.textContent="Tap a building to see it and assign workers. Unassigned residents: "+(st.R-e)+".";return}
+const J=T[s.type];let h="<b>"+J.e+" "+J.n+"</b> ";
+if(J.slots){h+=" Workers "+s.n+"/"+J.slots+' <button id="mn">−</button> <button id="pl">+</button> (free residents: '+(st.R-e)+")<br>";
+h+=J.inR?"Turns "+J.rate+" "+J.inR+" per worker per day into "+J.res+".":"Makes "+J.rate+" "+J.res+" per worker per day, before walking."}
+else h+=s.type==="house"?"Holds 4 residents. They eat 0.10 food per day.":"Goods are stored here. Build another to shorten walks.";
+p.innerHTML=h;if(J.slots){$("mn").onclick=()=>{setN(s,s.n-1);ui()};$("pl").onclick=()=>{if(emp()>=st.R)msg("No free residents.",1);else setN(s,s.n+1);ui()}}}
+function spd(v){st.speed=v;for(const k of[0,1,2,4])$("b"+k).className=k===v?"on":""}
+for(const k of[0,1,2,4])$("b"+k).onclick=()=>spd(k);
+$("tax").oninput=e=>{st.tax=+e.target.value;ui()};
+let last=performance.now(),acc=0;
+function loop(now){const dt=Math.min(.1,(now-last)/1000);last=now;
+if(st.speed)sim(dt*st.speed/TICK);draw();acc+=dt;if(acc>.25){acc=0;ui();pal2()}requestAnimationFrame(loop)}
+let pk="";function pal2(){const k=B.length+"|"+Math.floor(st.wood)+Math.floor(st.stone)+Math.floor(st.gold);if(k!==pk){pk=k;for(const b of $("pal").querySelectorAll("button")){}}}
+pal();ui();requestAnimationFrame(loop);
+</script></body></html>
