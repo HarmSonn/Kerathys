@@ -1,0 +1,25 @@
+{
+  "name": "kerathys",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tools",
+    "headless": "tsx tools/headless.ts",
+    "placeholders": "node tools/make-placeholders.mjs"
+  },
+  "dependencies": {
+    "pixi.js": "8.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.4"
+  }
+}
