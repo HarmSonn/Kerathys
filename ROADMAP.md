@@ -4,7 +4,7 @@
 
 Rules and numbers are in `docs/game-rules.md` and art requirements are in `docs/art-spec.md`. Every phase ends with a "done when" check. A phase isn't finished until that check passes.
 
-## Phase 0: Decisions and specs ← current
+## Phase 0: Decisions and specs ✓
 
 **Decided:**
 - 2-minute days with a 5-second night.
@@ -22,9 +22,9 @@ Rules and numbers are in `docs/game-rules.md` and art requirements are in `docs/
 
 **Remaining:** the open items in `docs/game-rules.md` section 12; the artist's questions in `docs/art-spec.md` section 9.
 
-**Done when:** both documents are agreed and the art test sheet has been checked.
+**Done when:** both documents are agreed and the art test sheet has been checked. *(Documents agreed; the art test sheet moves to the art track, since placeholders let coding start first.)*
 
-## Phase 1: Foundation and logistics core
+## Phase 1: Foundation and logistics core ← current: built, waiting for your first playtest
 
 Project setup:
 - Vite, TypeScript, PixiJS (rendering only) and Vitest.

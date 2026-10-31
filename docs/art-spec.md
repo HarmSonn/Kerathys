@@ -32,12 +32,11 @@ The canvas is wider than the footprint is tall because objects stand up out of t
 | Tree | 1 cell | 96 × 160 | 3–4 variants, plus a stump |
 | Rock | 1 cell | 96 × 80 | 3 stages: full, half, nearly gone |
 | Subject (one frame) | n/a | 64 × 96 | The figure itself is about 80 px tall |
-| Carried good | n/a | 48 × 48 | Drawn over the carrier's hands |
-| Good icon (UI) | n/a | 64 × 64 | Can be the same drawing as the carried good |
+| Good | n/a | 64 × 64 | One drawing per good, used both for carrying (shown smaller over the carrier) and as the UI icon |
 | Building icon (UI) | n/a | 128 × 128 | For the build menu |
 | Terrain texture | n/a | 512 × 512 | Must tile seamlessly |
 
-**Anchor point:** every sprite stands on the **bottom centre of its footprint**. I'll make template files with the footprint and anchor marked so every drawing lines up.
+**Anchor point:** every sprite stands on the **bottom centre of its footprint**. Template files with the footprint and anchor marked are in `art/templates/`: draw on top of them so every drawing lines up.
 
 ## 4. Animation
 
@@ -49,7 +48,7 @@ Other states:
 - **Sleeping** (lying down at night): 1 frame.
 
 Jobs share one walking figure:
-- The engine colours each job's tunic differently: carrier, builder, woodcutter, quarry worker, farmer, miller, baker.
+- The engine colours each job differently: carrier, builder, woodcutter, quarry worker, farmer, miller, baker. For now it tints the whole figure, so draw the tunic in a pale colour. A separate tunic layer can come later if the tint looks wrong on the real drawings.
 - Tools appear only in the work animations.
 
 Work animations: 4 frames each, 1 direction (mirrored by the engine).
@@ -86,7 +85,10 @@ Wood, stone, grain, flour, bread. Each needs one drawing (used for carrying and 
   - `buildings/stage_foundation_2x2.png`, `buildings/stage_scaffold_2x2.png`
   - `units/subject_walk_toward_0.png` … `units/subject_walk_toward_5.png`
   - `units/subject_walk_away_0.png` … `units/subject_walk_away_5.png`
-  - `units/woodcutter_chop_0.png` … `units/woodcutter_chop_3.png`
+  - `units/subject_idle_toward_0.png`, `units/subject_idle_toward_1.png` (same for `away`), `units/subject_sleep.png`
+  - `units/woodcutter_chop_0.png` … `_3`, `units/quarry_hack_0.png` … `_3`, `units/builder_hammer_0.png` … `_3`, `units/farmer_harvest_0.png` … `_3`
+  - `buildings/mill_sails.png` (256 × 256, turned by the engine)
+  - `ui/build_woodcutter.png` and so on, one per building (128 × 128)
   - `nature/tree_a.png`, `nature/tree_stump.png`, `nature/rock_1.png`
   - `goods/wood.png`
   - `terrain/grass.png`
@@ -103,7 +105,7 @@ Wood, stone, grain, flour, bread. Each needs one drawing (used for carrying and 
 7. Work animations
 8. Build menu icons
 
-Placeholder shapes stand in until each drawing arrives, so the game never waits for art.
+Every file already exists as a **placeholder** in `public/art/`, with the right name and size. To add a drawing, replace the placeholder file with the drawing (same name, same size) and reload the game. `npm run placeholders` only recreates files that are missing, so it never overwrites finished drawings.
 
 ## 9. Open questions for the artist
 

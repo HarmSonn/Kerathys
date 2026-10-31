@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Kerathys</title>
+  </head>
+  <body>
+    <header id="top">
+      <h1>Kerathys</h1>
+      <div id="stats"></div>
+      <div id="speed">
+        <button data-speed="0" title="Pause (space)">⏸</button>
+        <button data-speed="1" title="Normal speed (1)">1×</button>
+        <button data-speed="2" title="Double speed (2)">2×</button>
+        <button data-speed="4" title="Fast (3)">4×</button>
+      </div>
+      <div id="menu">
+        <button data-action="save">Save</button>
+        <button data-action="load">Load</button>
+        <button data-action="new">New</button>
+      </div>
+    </header>
+    <main>
+      <div id="game"><div id="loading">Loading…</div></div>
+      <aside id="panel"></aside>
+    </main>
+    <div id="msg"></div>
+    <nav id="palette"></nav>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
